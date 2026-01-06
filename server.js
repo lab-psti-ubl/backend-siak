@@ -54,7 +54,7 @@ import sseRoutes from "./routes/sseRoutes.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 5051;
 
 // Middleware
 app.use(cors());
