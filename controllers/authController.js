@@ -3,6 +3,7 @@ import Guru from '../models/Guru.js';
 import Murid from '../models/Murid.js';
 import DataKepsek from '../models/DataKepsek.js';
 import SystemActivation from '../models/SystemActivation.js';
+import Santri from '../models/Santri.js';
 import { generateToken } from '../middleware/authMiddleware.js';
 import { comparePassword, isPasswordHashed, hashPassword } from '../utils/passwordUtils.js';
 
@@ -64,6 +65,53 @@ export const login = async (req, res) => {
         foundUser = foundMurid;
         userRole = 'murid';
         userCollection = 'murid';
+      }
+    }
+
+    // If still not found, check Santri collection (santriData - santri yang bukan dari murid)
+    if (!foundUser) {
+      const santriDoc = await Santri.findOne({ id: 'santri-single' });
+      if (santriDoc && santriDoc.santriData) {
+        const foundSantri = santriDoc.santriData.find(s => s.email === email);
+        if (foundSantri) {
+          // Create user object from santriData
+          foundUser = {
+            id: foundSantri.id,
+            name: foundSantri.name,
+            email: foundSantri.email,
+            password: foundSantri.password,
+            avatar: foundSantri.avatar || foundSantri.profileImage,
+            profileImage: foundSantri.profileImage || foundSantri.avatar,
+            nisn: foundSantri.nisn,
+            kelasId: undefined, // Santri tidak punya kelasId
+            whatsappOrtu: foundSantri.whatsappOrtu,
+            isActive: foundSantri.isActive !== false,
+            rfidGuid: foundSantri.rfidGuid,
+            createdAt: foundSantri.createdAt,
+            role: 'murid',
+            isFromMurid: false,
+            toObject: function() { return this; }, // For compatibility with mongoose document
+            save: async function() {
+              // Update santriData in database
+              const doc = await Santri.findOne({ id: 'santri-single' });
+              if (doc) {
+                const index = doc.santriData.findIndex(s => s.id === this.id);
+                if (index >= 0) {
+                  doc.santriData[index] = {
+                    ...doc.santriData[index],
+                    password: this.password,
+                    avatar: this.avatar,
+                    profileImage: this.profileImage,
+                  };
+                  doc.updatedAt = new Date().toISOString();
+                  await doc.save();
+                }
+              }
+            },
+          };
+          userRole = 'murid';
+          userCollection = 'santri';
+        }
       }
     }
 
@@ -132,8 +180,16 @@ export const login = async (req, res) => {
       });
     }
 
-    // For murid (students), check if they are inactive due to graduation (alumni) or truly deactivated
-    // Note: Alumni can still login, so we allow it
+    // For murid/santri (students), check if they are inactive
+    // Block login for inactive santri (both from murid and santriData)
+    if (userRole === 'murid' && foundUser.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: 'Akun Anda tidak aktif. Silakan hubungi bagian akademik untuk informasi lebih lanjut.',
+      });
+    }
+
+    // Note: Alumni can still login, so we allow it for murid from murid collection
 
     // Check password based on role
     let isValidPassword = false;
@@ -241,12 +297,38 @@ export const getCurrentUser = async (req, res) => {
       
       // If query params provided, use them; otherwise use token data
       let user;
+      let userObj;
       if (userId) {
         // Search based on role from token
         if (userRole === 'guru') {
           user = await Guru.findOne({ id: userId });
         } else if (userRole === 'murid') {
           user = await Murid.findOne({ id: userId });
+          // If not found in Murid, check Santri collection (santriData)
+          if (!user) {
+            const santriDoc = await Santri.findOne({ id: 'santri-single' });
+            if (santriDoc && santriDoc.santriData) {
+              const foundSantri = santriDoc.santriData.find(s => s.id === userId);
+              if (foundSantri) {
+                userObj = {
+                  id: foundSantri.id,
+                  name: foundSantri.name,
+                  email: foundSantri.email,
+                  password: foundSantri.password,
+                  avatar: foundSantri.avatar || foundSantri.profileImage,
+                  profileImage: foundSantri.profileImage || foundSantri.avatar,
+                  nisn: foundSantri.nisn,
+                  kelasId: undefined,
+                  whatsappOrtu: foundSantri.whatsappOrtu,
+                  isActive: foundSantri.isActive !== false,
+                  rfidGuid: foundSantri.rfidGuid,
+                  createdAt: foundSantri.createdAt,
+                  role: 'murid',
+                  isFromMurid: false,
+                };
+              }
+            }
+          }
         } else {
           user = await User.findOne({ id: userId });
         }
@@ -258,6 +340,31 @@ export const getCurrentUser = async (req, res) => {
         }
         if (!user) {
           user = await Murid.findOne({ email });
+          // If not found in Murid, check Santri collection (santriData)
+          if (!user) {
+            const santriDoc = await Santri.findOne({ id: 'santri-single' });
+            if (santriDoc && santriDoc.santriData) {
+              const foundSantri = santriDoc.santriData.find(s => s.email === email);
+              if (foundSantri) {
+                userObj = {
+                  id: foundSantri.id,
+                  name: foundSantri.name,
+                  email: foundSantri.email,
+                  password: foundSantri.password,
+                  avatar: foundSantri.avatar || foundSantri.profileImage,
+                  profileImage: foundSantri.profileImage || foundSantri.avatar,
+                  nisn: foundSantri.nisn,
+                  kelasId: undefined,
+                  whatsappOrtu: foundSantri.whatsappOrtu,
+                  isActive: foundSantri.isActive !== false,
+                  rfidGuid: foundSantri.rfidGuid,
+                  createdAt: foundSantri.createdAt,
+                  role: 'murid',
+                  isFromMurid: false,
+                };
+              }
+            }
+          }
         }
       } else {
         // Use user from token - search based on role
@@ -265,19 +372,47 @@ export const getCurrentUser = async (req, res) => {
           user = await Guru.findOne({ id: req.user.id });
         } else if (userRole === 'murid') {
           user = await Murid.findOne({ id: req.user.id });
+          // If not found in Murid, check Santri collection (santriData)
+          if (!user) {
+            const santriDoc = await Santri.findOne({ id: 'santri-single' });
+            if (santriDoc && santriDoc.santriData) {
+              const foundSantri = santriDoc.santriData.find(s => s.id === req.user.id);
+              if (foundSantri) {
+                userObj = {
+                  id: foundSantri.id,
+                  name: foundSantri.name,
+                  email: foundSantri.email,
+                  password: foundSantri.password,
+                  avatar: foundSantri.avatar || foundSantri.profileImage,
+                  profileImage: foundSantri.profileImage || foundSantri.avatar,
+                  nisn: foundSantri.nisn,
+                  kelasId: undefined,
+                  whatsappOrtu: foundSantri.whatsappOrtu,
+                  isActive: foundSantri.isActive !== false,
+                  rfidGuid: foundSantri.rfidGuid,
+                  createdAt: foundSantri.createdAt,
+                  role: 'murid',
+                  isFromMurid: false,
+                };
+              }
+            }
+          }
         } else {
           user = await User.findOne({ id: req.user.id });
         }
       }
       
-      if (!user) {
+      if (!user && !userObj) {
         return res.status(404).json({
           success: false,
           message: 'User tidak ditemukan',
         });
       }
 
-      const userObj = user.toObject();
+      // If userObj is already set (from santriData), use it; otherwise convert mongoose document
+      if (!userObj) {
+        userObj = user.toObject();
+      }
       // Ensure role is set
       if (!userObj.role) {
         userObj.role = userRole;
@@ -300,6 +435,7 @@ export const getCurrentUser = async (req, res) => {
     }
 
     let user;
+    let userObj;
     if (userId) {
       // Try all collections
       user = await User.findOne({ id: userId });
@@ -308,6 +444,31 @@ export const getCurrentUser = async (req, res) => {
       }
       if (!user) {
         user = await Murid.findOne({ id: userId });
+      }
+      // If not found in Murid, check Santri collection (santriData)
+      if (!user) {
+        const santriDoc = await Santri.findOne({ id: 'santri-single' });
+        if (santriDoc && santriDoc.santriData) {
+          const foundSantri = santriDoc.santriData.find(s => s.id === userId);
+          if (foundSantri) {
+            userObj = {
+              id: foundSantri.id,
+              name: foundSantri.name,
+              email: foundSantri.email,
+              password: foundSantri.password,
+              avatar: foundSantri.avatar || foundSantri.profileImage,
+              profileImage: foundSantri.profileImage || foundSantri.avatar,
+              nisn: foundSantri.nisn,
+              kelasId: undefined,
+              whatsappOrtu: foundSantri.whatsappOrtu,
+              isActive: foundSantri.isActive !== false,
+              rfidGuid: foundSantri.rfidGuid,
+              createdAt: foundSantri.createdAt,
+              role: 'murid',
+              isFromMurid: false,
+            };
+          }
+        }
       }
     } else {
       // Search by email in all collections
@@ -318,24 +479,52 @@ export const getCurrentUser = async (req, res) => {
       if (!user) {
         user = await Murid.findOne({ email });
       }
+      // If not found in Murid, check Santri collection (santriData)
+      if (!user) {
+        const santriDoc = await Santri.findOne({ id: 'santri-single' });
+        if (santriDoc && santriDoc.santriData) {
+          const foundSantri = santriDoc.santriData.find(s => s.email === email);
+          if (foundSantri) {
+            userObj = {
+              id: foundSantri.id,
+              name: foundSantri.name,
+              email: foundSantri.email,
+              password: foundSantri.password,
+              avatar: foundSantri.avatar || foundSantri.profileImage,
+              profileImage: foundSantri.profileImage || foundSantri.avatar,
+              nisn: foundSantri.nisn,
+              kelasId: undefined,
+              whatsappOrtu: foundSantri.whatsappOrtu,
+              isActive: foundSantri.isActive !== false,
+              rfidGuid: foundSantri.rfidGuid,
+              createdAt: foundSantri.createdAt,
+              role: 'murid',
+              isFromMurid: false,
+            };
+          }
+        }
+      }
     }
     
-    if (!user) {
+    if (!user && !userObj) {
       return res.status(404).json({
         success: false,
         message: 'User tidak ditemukan',
       });
     }
 
-    const userObj = user.toObject();
-    // Determine role based on which collection it came from
-    if (!userObj.role) {
-      if (user instanceof Guru || user.constructor.modelName === 'Guru') {
-        userObj.role = 'guru';
-      } else if (user instanceof Murid || user.constructor.modelName === 'Murid') {
-        userObj.role = 'murid';
-      } else {
-        userObj.role = 'admin'; // Default
+    // If userObj is already set (from santriData), use it; otherwise convert mongoose document
+    if (!userObj) {
+      userObj = user.toObject();
+      // Determine role based on which collection it came from
+      if (!userObj.role) {
+        if (user instanceof Guru || user.constructor.modelName === 'Guru') {
+          userObj.role = 'guru';
+        } else if (user instanceof Murid || user.constructor.modelName === 'Murid') {
+          userObj.role = 'murid';
+        } else {
+          userObj.role = 'admin'; // Default
+        }
       }
     }
 

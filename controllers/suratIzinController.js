@@ -5,6 +5,8 @@ import JadwalPelajaran from '../models/JadwalPelajaran.js';
 import TahunAjaran from '../models/TahunAjaran.js';
 import Guru from '../models/Guru.js';
 import Murid from '../models/Murid.js';
+import Santri from '../models/Santri.js';
+import KelasTahfiz from '../models/KelasTahfiz.js';
 
 export const getAllSuratIzin = async (req, res) => {
   try {
@@ -99,6 +101,30 @@ export const getSuratIzinByStatus = async (req, res) => {
   }
 };
 
+export const getSuratIzinByUstadzId = async (req, res) => {
+  try {
+    const { ustadzId } = req.query;
+    if (!ustadzId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter ustadzId diperlukan',
+      });
+    }
+    const suratIzin = await SuratIzin.find({ ustadzId }).sort({ createdAt: -1 });
+    return res.json({
+      success: true,
+      suratIzin: suratIzin.map(s => s.toObject()),
+    });
+  } catch (error) {
+    console.error('Error getting surat izin by ustadzId:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data surat izin',
+      error: error.message,
+    });
+  }
+};
+
 export const createSuratIzin = async (req, res) => {
   try {
     const {
@@ -144,6 +170,36 @@ export const createSuratIzin = async (req, res) => {
       finalTahunAjaranId = activeTahunAjaran.id;
     }
 
+    // Check if santri is a class member (murid kelas)
+    const murid = await Murid.findOne({ id: muridId });
+    let ustadzId = null;
+
+    // If murid not found or murid doesn't have kelasId, check if it's a santri in tahfiz class
+    if (!murid || !murid.kelasId) {
+      // Check if this is a santri (either from muridIds or santriData)
+      const santriDoc = await Santri.findOne({ id: 'santri-single' });
+      
+      if (santriDoc) {
+        // Check if muridId is in muridIds or santriData
+        const isInMuridIds = santriDoc.muridIds.some(item => {
+          const id = typeof item === 'string' ? item : item.id;
+          return id === muridId;
+        });
+        const isInSantriData = santriDoc.santriData?.some(s => s.id === muridId);
+
+        if (isInMuridIds || isInSantriData) {
+          // Find the tahfiz class that contains this santri
+          const kelasTahfiz = await KelasTahfiz.findOne({
+            santriIds: { $in: [muridId] }
+          });
+
+          if (kelasTahfiz && kelasTahfiz.ustadzId) {
+            ustadzId = kelasTahfiz.ustadzId;
+          }
+        }
+      }
+    }
+
     const suratData = {
       id,
       muridId,
@@ -156,6 +212,7 @@ export const createSuratIzin = async (req, res) => {
       bukti,
       status: status || 'menunggu',
       keterangan,
+      ustadzId: ustadzId || undefined,
       tahunAjaranId: finalTahunAjaranId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

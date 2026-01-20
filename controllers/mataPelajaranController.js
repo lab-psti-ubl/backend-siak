@@ -173,7 +173,7 @@ export const updateMataPelajaran = async (req, res) => {
     if (keterangan) updateData.keterangan = keterangan;
     if (keterangan === 'jurusan') {
       updateData.jurusanId = jurusanId;
-    } else if (keterangan === 'umum') {
+    } else if (keterangan === 'umum' || keterangan === 'agama') {
       updateData.jurusanId = undefined;
     }
     if (semester) updateData.semester = semester;

@@ -14,6 +14,7 @@ const suratIzinSchema = new mongoose.Schema({
   keterangan: { type: String },
   verifiedBy: { type: String },
   verifiedAt: { type: String },
+  ustadzId: { type: String }, // For santri who are not class members (non-murid kelas)
   tahunAjaranId: { type: String, required: true },
   createdAt: { type: String, default: () => new Date().toISOString() },
   updatedAt: { type: String, default: () => new Date().toISOString() },

@@ -24,7 +24,7 @@ const mataPelajaranSchema = new mongoose.Schema({
   keterangan: {
     type: String,
     required: true,
-    enum: ['umum', 'jurusan'],
+    enum: ['umum', 'jurusan', 'agama'],
   },
   jurusanId: {
     type: String,

@@ -86,7 +86,7 @@ export const getPengaturanAbsenById = async (req, res) => {
 // Create or update pengaturan absen (single record only)
 export const createPengaturanAbsen = async (req, res) => {
   try {
-    const { jamMasuk, toleransiMasuk, jamPulang, toleransiPulang, hariSekolah, hariKerja, isActive } = req.body;
+    const { jamMasuk, toleransiMasuk, jamPulang, toleransiPulang, hariSekolah, hariKerja, isActive, enableManualAbsen } = req.body;
 
     // Validation
     if (!jamMasuk || toleransiMasuk === undefined || !jamPulang || toleransiPulang === undefined) {
@@ -135,6 +135,7 @@ export const createPengaturanAbsen = async (req, res) => {
       pengaturanAbsen.hariSekolah = hariSekolah; // Always update, no fallback
       pengaturanAbsen.hariKerja = hariKerja; // Always update, no fallback
       pengaturanAbsen.isActive = isActive !== undefined ? isActive : true;
+      pengaturanAbsen.enableManualAbsen = enableManualAbsen !== undefined ? enableManualAbsen : true;
 
       await pengaturanAbsen.save();
 
@@ -154,6 +155,7 @@ export const createPengaturanAbsen = async (req, res) => {
         hariSekolah: hariSekolah, // Use provided value, no fallback
         hariKerja: hariKerja, // Use provided value, no fallback
         isActive: isActive !== undefined ? isActive : true,
+        enableManualAbsen: enableManualAbsen !== undefined ? enableManualAbsen : true,
         createdAt: new Date().toISOString(),
       });
 
@@ -178,7 +180,7 @@ export const createPengaturanAbsen = async (req, res) => {
 export const updatePengaturanAbsen = async (req, res) => {
   try {
     const { id } = req.params;
-    const { jamMasuk, toleransiMasuk, jamPulang, toleransiPulang, hariSekolah, hariKerja, isActive } = req.body;
+    const { jamMasuk, toleransiMasuk, jamPulang, toleransiPulang, hariSekolah, hariKerja, isActive, enableManualAbsen } = req.body;
 
     let pengaturanAbsen = await PengaturanAbsen.findOne({ id });
     
@@ -202,6 +204,7 @@ export const updatePengaturanAbsen = async (req, res) => {
     if (hariSekolah !== undefined) pengaturanAbsen.hariSekolah = hariSekolah;
     if (hariKerja !== undefined) pengaturanAbsen.hariKerja = hariKerja;
     if (isActive !== undefined) pengaturanAbsen.isActive = isActive;
+    if (enableManualAbsen !== undefined) pengaturanAbsen.enableManualAbsen = enableManualAbsen;
 
     await pengaturanAbsen.save();
 

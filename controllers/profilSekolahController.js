@@ -35,6 +35,8 @@ export const saveProfilSekolah = async (req, res) => {
       deskripsi,
       misiSekolah,
       visiSekolah,
+      latitude,
+      longitude,
     } = req.body;
 
     // Validation
@@ -63,6 +65,8 @@ export const saveProfilSekolah = async (req, res) => {
       profilSekolah.deskripsi = deskripsi;
       profilSekolah.misiSekolah = misiSekolah;
       profilSekolah.visiSekolah = visiSekolah;
+      profilSekolah.latitude = latitude;
+      profilSekolah.longitude = longitude;
       profilSekolah.updatedAt = new Date().toISOString();
 
       await profilSekolah.save();
@@ -89,6 +93,8 @@ export const saveProfilSekolah = async (req, res) => {
         deskripsi,
         misiSekolah,
         visiSekolah,
+        latitude,
+        longitude,
         createdAt: new Date().toISOString(),
       });
 

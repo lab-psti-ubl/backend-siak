@@ -3,6 +3,7 @@ import {
   getAllSuratIzin,
   getSuratIzinById,
   getSuratIzinByStatus,
+  getSuratIzinByUstadzId,
   createSuratIzin,
   updateSuratIzin,
   deleteSuratIzin,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get('/', authenticateToken, getAllSuratIzin);
 router.get('/by-status', authenticateToken, getSuratIzinByStatus);
+router.get('/by-ustadz', authenticateToken, getSuratIzinByUstadzId);
 // Public route for verification (no auth required) - must be before /:id
 router.get('/verification/:id', getSuratIzinById);
 router.get('/:id', authenticateToken, getSuratIzinById);

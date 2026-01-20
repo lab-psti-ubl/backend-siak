@@ -49,6 +49,11 @@ const pengaturanAbsenSchema = new mongoose.Schema({
     required: true,
     default: true,
   },
+  enableManualAbsen: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
   createdAt: {
     type: String,
     required: true,

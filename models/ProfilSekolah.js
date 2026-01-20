@@ -25,6 +25,8 @@ const profilSekolahSchema = new mongoose.Schema({
   deskripsi: String,
   misiSekolah: String,
   visiSekolah: String,
+  latitude: Number,
+  longitude: Number,
   createdAt: {
     type: String,
     required: true,
