@@ -4,8 +4,16 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 
 /**
  * Middleware untuk memverifikasi JWT token
+ * Allows requests with isInitialSetup: true to pass without authentication
  */
 export const authenticateToken = (req, res, next) => {
+  // Allow initial setup requests without authentication (similar to jenjang setup)
+  if (req.body && req.body.isInitialSetup === true) {
+    // For initial setup, skip authentication
+    req.user = null; // No user for initial setup
+    return next();
+  }
+
   // Get token from Authorization header
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
