@@ -25,6 +25,9 @@ const guruAbsensiSchema = new mongoose.Schema({
   },
   keterangan: { type: String },
   keteranganAbsensi: { type: String, enum: ['Hadir', 'Izin', 'Sakit', 'Bolos', 'Dispen', 'Alfa'] },
+  // Informasi sumber data (untuk kebutuhan audit/fallback)
+  sumberData: { type: String, enum: ['worker', 'server'] },
+  sumberDataUpdatedAt: { type: String },
   fotoMengajar: [fotoMengajarSchema],
 }, { _id: false });
 

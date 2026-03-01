@@ -1,6 +1,7 @@
 import Absensi from '../models/Absensi.js';
 import TahunAjaran from '../models/TahunAjaran.js';
 import Murid from '../models/Murid.js';
+import { getISOStringIndonesia } from '../utils/dateUtils.js';
 
 // Helper function: Convert new structure to old format (for backward compatibility with frontend)
 const convertToOldFormat = (absensiDoc, muridId = null, kelasId = null) => {
@@ -137,8 +138,8 @@ const getOrCreateAbsensiDoc = async (tanggal, tahunAjaranId, semester) => {
       tahunAjaranId,
       semester,
       kelas: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getISOStringIndonesia(),
+      updatedAt: getISOStringIndonesia(),
     });
     await absensiDoc.save();
   }
@@ -501,6 +502,10 @@ export const createAbsensi = async (req, res) => {
     if (statusAbsen) attendanceData.statusAbsen = statusAbsen;
     if (keteranganAbsensi) attendanceData.keteranganAbsensi = keteranganAbsensi;
     if (sesiId) attendanceData.sesiId = sesiId;
+    
+    // Add sumberData for server
+    attendanceData.sumberData = 'server';
+    attendanceData.sumberDataUpdatedAt = getISOStringIndonesia();
     
     // Use atomic operation to avoid version conflicts
     const absensiId = absensiDoc.id;

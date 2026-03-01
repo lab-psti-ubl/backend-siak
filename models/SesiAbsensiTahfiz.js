@@ -21,6 +21,9 @@ const sesiAbsensiTahfizSchema = new mongoose.Schema({
     method: { type: String, enum: ['qr', 'manual', 'admin-qr'], required: true },
     statusAbsen: { type: String, enum: ['hadir', 'terlambat', 'pulang_cepat', 'tepat_waktu'] },
     keteranganAbsensi: { type: String, enum: ['Hadir', 'Izin', 'Sakit', 'Bolos', 'Dispen', 'Alfa'] },
+    // Informasi sumber data (untuk kebutuhan audit/fallback)
+    sumberData: { type: String, enum: ['worker', 'server'] },
+    sumberDataUpdatedAt: { type: String },
   }],
   tahun: { type: String, required: true }, // Only year, no semester
   createdAt: { type: String, default: () => new Date().toISOString() },

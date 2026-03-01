@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import User from '../models/User.js';
-import { hashPassword } from '../utils/passwordUtils.js';
+import SystemActivation from '../models/SystemActivation.js';
+import { hashPassword, comparePassword, isPasswordHashed } from '../utils/passwordUtils.js';
 
 /**
  * Reset database - menghapus semua data kecuali data default yang diperlukan
@@ -12,7 +13,8 @@ import { hashPassword } from '../utils/passwordUtils.js';
  * - Semua collections lainnya akan dihapus
  * - Data default akan dibuat ulang melalui fungsi initialize di database.js
  */
-const GST_PASSWORD = 'gst';
+// Hash default untuk kode aktivasi awal (berpasangan dengan sandi 'gst')
+const DEFAULT_ACTIVATION_CODE_HASH = '$2a$10$WXO7BLwVGiq6kQzmGa4heeHhm4B0GQbke1Vl8L4pUWne71jVdw6lq';
 
 export const resetDatabase = async (req, res) => {
   try {
@@ -33,8 +35,34 @@ export const resetDatabase = async (req, res) => {
       });
     }
 
-    // Verify activation password
-    if (activationPassword !== GST_PASSWORD) {
+    // Verify activation password berdasarkan SystemActivation (hash bcrypt)
+    const activation = await SystemActivation.findOne();
+    let isValidActivationPassword = false;
+
+    if (activation && activation.activationCode) {
+      if (isPasswordHashed(activation.activationCode)) {
+        isValidActivationPassword = await comparePassword(
+          activationPassword,
+          activation.activationCode
+        );
+      } else {
+        const expectedCode = activation.activationCode;
+        isValidActivationPassword = activationPassword === expectedCode;
+        if (isValidActivationPassword) {
+          const hashedCode = await hashPassword(expectedCode);
+          activation.activationCode = hashedCode;
+          await activation.save();
+        }
+      }
+    } else {
+      // Fallback ke hash default jika belum ada data aktivasi
+      isValidActivationPassword = await comparePassword(
+        activationPassword,
+        DEFAULT_ACTIVATION_CODE_HASH
+      );
+    }
+
+    if (!isValidActivationPassword) {
       return res.status(401).json({
         success: false,
         message: 'Sandi aktivasi salah. Silakan coba lagi.',
@@ -141,8 +169,9 @@ export const resetDatabase = async (req, res) => {
     await dbModule.initializeDefaultWaliKelasSettings();
     
     // SystemActivation tidak perlu diinisialisasi ulang karena sudah dipertahankan
-    // PengaturanSistem juga tidak perlu diinisialisasi ulang - akan dibuat saat pertama kali diakses
+    // PengaturanSistem TIDAK diinisialisasi ulang - akan dibuat saat user memilih sistem sekolah
     // Ini memastikan aplikasi kembali ke flow setup awal (pilih sistem -> pilih jenjang)
+    // PengaturanSistem collection sudah dihapus di atas, jadi tidak akan ada default value
 
     return res.json({
       success: true,

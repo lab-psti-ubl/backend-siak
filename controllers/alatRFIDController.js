@@ -84,6 +84,7 @@ export const createAlatRFID = async (req, res) => {
       lokasi,
       token,
       status,
+      jenisAbsen,
     } = req.body;
 
     if (!namaAlat || !lokasi) {
@@ -114,12 +115,18 @@ export const createAlatRFID = async (req, res) => {
       });
     }
 
+    const allowedJenisAbsen = ['rfid', 'facerecognition'];
+    const finalJenisAbsen = allowedJenisAbsen.includes(jenisAbsen)
+      ? jenisAbsen
+      : 'rfid';
+
     const newAlat = new AlatRFID({
       id: finalId,
       namaAlat,
       lokasi,
       token: finalToken,
       status: status || 'aktif',
+      jenisAbsen: finalJenisAbsen,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });

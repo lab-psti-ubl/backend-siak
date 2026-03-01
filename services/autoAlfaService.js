@@ -3,6 +3,7 @@ import AbsensiGuru from '../models/AbsensiGuru.js';
 import PengaturanAbsen from '../models/PengaturanAbsen.js';
 import TahunAjaran from '../models/TahunAjaran.js';
 import { broadcastSSEEvent } from '../utils/sseBroadcaster.js';
+import { getTodayIndonesia, getCurrentTimeIndonesia } from '../utils/dateUtils.js';
 
 /**
  * Service untuk AUTO-ALFA absen pulang murid dan guru
@@ -59,18 +60,17 @@ class AutoAlfaService {
   }
 
   /**
-   * Mendapatkan waktu saat ini dalam format HH:MM
+   * Mendapatkan waktu saat ini dalam format HH:MM (WIB/Indonesia)
    */
   getCurrentTime() {
-    const now = new Date();
-    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    return getCurrentTimeIndonesia();
   }
 
   /**
-   * Mendapatkan tanggal hari ini dalam format YYYY-MM-DD
+   * Mendapatkan tanggal hari ini dalam format YYYY-MM-DD (WIB/Indonesia)
    */
   getToday() {
-    return new Date().toISOString().split('T')[0];
+    return getTodayIndonesia();
   }
 
   /**

@@ -236,7 +236,7 @@ export const addSantri = async (req, res) => {
       }
 
       // Hash password
-      const passwordToSave = password || 'abc1234';
+      const passwordToSave = password || 'cerdasdanreligius';
       const hashedPassword = await hashPassword(passwordToSave);
 
       // Create new santri data

@@ -11,6 +11,12 @@ const systemActivationSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
+  /** Kode aktivasi untuk mengaktifkan sistem.
+   * Nilai default 'gst' disimpan dalam bentuk hash dan diatur dari controller.
+   */
+  activationCode: {
+    type: String,
+  },
   activatedAt: String,
   activatedBy: String,
   createdAt: {

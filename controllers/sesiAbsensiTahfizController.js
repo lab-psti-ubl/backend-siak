@@ -1,4 +1,5 @@
 import SesiAbsensiTahfiz from '../models/SesiAbsensiTahfiz.js';
+import { getISOStringIndonesia } from '../utils/dateUtils.js';
 
 export const getAllSesiAbsensiTahfiz = async (req, res) => {
   try {
@@ -111,8 +112,8 @@ export const createSesiAbsensiTahfiz = async (req, res) => {
       createdBy,
       jurnal,
       tahun,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getISOStringIndonesia(),
+      updatedAt: getISOStringIndonesia(),
     });
 
     await newSesi.save();
@@ -145,7 +146,7 @@ export const updateSesiAbsensiTahfiz = async (req, res) => {
     }
 
     delete updateData.id; // Prevent ID change
-    updateData.updatedAt = new Date().toISOString();
+    updateData.updatedAt = getISOStringIndonesia();
 
     await SesiAbsensiTahfiz.updateOne({ id }, updateData);
     const updatedSesi = await SesiAbsensiTahfiz.findOne({ id });
@@ -227,6 +228,9 @@ export const addAbsensiToSesiTahfiz = async (req, res) => {
       method: absensiData.method,
       statusAbsen: absensiData.statusAbsen,
       keteranganAbsensi: absensiData.keteranganAbsensi,
+      // Add sumberData for server (fallback)
+      sumberData: 'server',
+      sumberDataUpdatedAt: getISOStringIndonesia(),
     };
 
     if (existingIndex !== undefined && existingIndex >= 0) {
@@ -240,7 +244,7 @@ export const addAbsensiToSesiTahfiz = async (req, res) => {
       sesi.dataAbsensi.push(newAbsensi);
     }
 
-    sesi.updatedAt = new Date().toISOString();
+    sesi.updatedAt = getISOStringIndonesia();
     await sesi.save();
 
     return res.json({
@@ -280,7 +284,7 @@ export const removeAbsensiFromSesiTahfiz = async (req, res) => {
     }
 
     sesi.dataAbsensi = sesi.dataAbsensi.filter(a => a.id !== absensiId);
-    sesi.updatedAt = new Date().toISOString();
+    sesi.updatedAt = getISOStringIndonesia();
     await sesi.save();
 
     return res.json({
@@ -342,6 +346,9 @@ export const bulkAddAbsensiToSesiTahfiz = async (req, res) => {
         method: absensiData.method,
         statusAbsen: absensiData.statusAbsen,
         keteranganAbsensi: absensiData.keteranganAbsensi,
+        // Add sumberData for server (fallback)
+        sumberData: 'server',
+        sumberDataUpdatedAt: getISOStringIndonesia(),
       };
 
       if (existingIndex >= 0) {
@@ -353,7 +360,7 @@ export const bulkAddAbsensiToSesiTahfiz = async (req, res) => {
       results.push(newAbsensi);
     }
 
-    sesi.updatedAt = new Date().toISOString();
+    sesi.updatedAt = getISOStringIndonesia();
     await sesi.save();
 
     return res.json({

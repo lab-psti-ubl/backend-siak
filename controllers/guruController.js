@@ -3,6 +3,7 @@ import Kelas from '../models/Kelas.js';
 import { hashPassword, comparePassword } from '../utils/passwordUtils.js';
 import { ensureRiwayatKelasWali } from '../utils/riwayatWaliKelasUtils.js';
 import { isEmailUnique, isRfidGuidUnique } from '../utils/validationUtils.js';
+import { getUniqueUsernameForGuru } from '../utils/usernameUtils.js';
 
 // Get all gurus
 export const getAllGurus = async (req, res) => {
@@ -111,13 +112,17 @@ export const createGuru = async (req, res) => {
     }
 
     // Hash password before saving
-    const passwordToSave = password || 'abc1234';
+    const passwordToSave = password || 'cerdasdanreligius';
     const hashedPassword = await hashPassword(passwordToSave);
+
+    // Username: nama lengkap huruf kecil tanpa spasi (e.g. Ari Mardiansyah -> arimardiansyah)
+    const username = await getUniqueUsernameForGuru(name);
 
     // Create new guru
     const newGuru = new Guru({
       id: `guru${Date.now()}`,
       name,
+      username,
       email,
       phone,
       nip,
@@ -228,7 +233,11 @@ export const updateGuru = async (req, res) => {
     // Update guru data
     const updateData = {};
     const unsetData = {};
-    if (name) updateData.name = name;
+    if (name) {
+      updateData.name = name;
+      // Username ikut diperbarui dari nama (huruf kecil, tanpa spasi)
+      updateData.username = await getUniqueUsernameForGuru(name, id);
+    }
     if (email) updateData.email = email;
     if (phone !== undefined) updateData.phone = phone;
     if (nip) updateData.nip = nip;
@@ -391,7 +400,10 @@ export const updateProfilGuru = async (req, res) => {
 
     // Update hanya field yang diizinkan untuk update profil sendiri
     const updateData = {};
-    if (name) updateData.name = name.trim();
+    if (name) {
+      updateData.name = name.trim();
+      updateData.username = await getUniqueUsernameForGuru(name.trim(), userId);
+    }
     if (email) updateData.email = email.trim();
     if (phone !== undefined) updateData.phone = phone ? phone.trim() : undefined;
     if (profileImage !== undefined) updateData.profileImage = profileImage;

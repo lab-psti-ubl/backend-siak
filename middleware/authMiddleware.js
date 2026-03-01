@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ JWT_SECRET belum diset di file .env');
+  process.exit(1);
+}
 
 /**
  * Middleware untuk memverifikasi JWT token
@@ -89,8 +93,12 @@ export const generateToken = (user) => {
     name: user.name,
   };
 
-  // Token expires in 24 hours
-  const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
+  // Token expires in 30 days (720 hours) for PWA persistence
+  // This ensures users stay logged in when app is installed as PWA
+  const expiresIn = process.env.JWT_EXPIRES_IN;
+  if (!expiresIn) {
+    throw new Error('JWT_EXPIRES_IN belum diset di file .env');
+  }
 
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 };

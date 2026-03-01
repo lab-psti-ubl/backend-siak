@@ -26,6 +26,9 @@ const muridAbsensiSchema = new mongoose.Schema({
   statusAbsen: { type: String, enum: ['hadir', 'terlambat', 'pulang_cepat', 'tepat_waktu'] },
   keteranganAbsensi: { type: String, enum: ['Hadir', 'Izin', 'Sakit', 'Bolos', 'Dispen', 'Alfa'] },
   sesiId: { type: String }, // Deprecated, kept for backward compatibility
+  // Informasi sumber data (untuk kebutuhan audit/fallback)
+  sumberData: { type: String, enum: ['worker', 'server'] },
+  sumberDataUpdatedAt: { type: String },
 }, { _id: false });
 
 // Schema for session metadata

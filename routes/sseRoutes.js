@@ -4,7 +4,11 @@ import { addSSEClient, removeSSEClient } from '../utils/sseBroadcaster.js';
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ JWT_SECRET belum diset di file .env');
+  process.exit(1);
+}
 
 /**
  * Middleware untuk authenticate SSE connection

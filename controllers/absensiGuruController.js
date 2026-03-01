@@ -1,6 +1,7 @@
 import AbsensiGuru from '../models/AbsensiGuru.js';
 import TahunAjaran from '../models/TahunAjaran.js';
 import Guru from '../models/Guru.js';
+import { getISOStringIndonesia } from '../utils/dateUtils.js';
 
 // Helper function: Convert new structure to old format (for backward compatibility with frontend)
 const convertToOldFormat = (absensiGuruDoc, guruId = null) => {
@@ -69,17 +70,26 @@ const getOrCreateAbsensiGuruDoc = async (tanggal, tahunAjaranId, semester) => {
   
   let absensiGuruDoc = await AbsensiGuru.findOne({ id: absensiGuruId });
   
-  if (!absensiGuruDoc) {
+  if (absensiGuruDoc) return absensiGuruDoc;
+  
+  // Create with race-condition safety (avoid duplicate key on concurrent creates)
+  try {
     absensiGuruDoc = new AbsensiGuru({
       id: absensiGuruId,
       tanggal,
       tahunAjaranId,
       semester,
       guru: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: getISOStringIndonesia(),
+      updatedAt: getISOStringIndonesia(),
     });
     await absensiGuruDoc.save();
+  } catch (err) {
+    if (err && err.code === 11000) {
+      const existing = await AbsensiGuru.findOne({ id: absensiGuruId });
+      if (existing) return existing;
+    }
+    throw err;
   }
   
   return absensiGuruDoc;
@@ -446,6 +456,8 @@ export const createAbsensiGuru = async (req, res) => {
       statusKeluar,
       keterangan,
       keteranganAbsensi,
+      sumberData: 'server',
+      sumberDataUpdatedAt: getISOStringIndonesia(),
       fotoMengajar: fotoMengajar || [],
     };
     

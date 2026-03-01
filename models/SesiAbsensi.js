@@ -32,6 +32,9 @@ const sesiAbsensiSchema = new mongoose.Schema({
     method: { type: String, enum: ['qr', 'manual', 'admin-qr'], required: true },
     statusAbsen: { type: String, enum: ['hadir', 'terlambat', 'pulang_cepat', 'tepat_waktu'] },
     keteranganAbsensi: { type: String, enum: ['Hadir', 'Izin', 'Sakit', 'Bolos', 'Dispen', 'Alfa'] },
+    // Informasi sumber data (untuk kebutuhan audit/fallback)
+    sumberData: { type: String, enum: ['worker', 'server'] },
+    sumberDataUpdatedAt: { type: String },
   }],
   tahunAjaranId: { type: String, required: true },
   semester: { type: Number, required: true },

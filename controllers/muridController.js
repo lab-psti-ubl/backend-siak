@@ -143,7 +143,7 @@ export const createMurid = async (req, res) => {
     const qrCode = generateQRCodeData(newId, nisn, name, kelasId);
 
     // Hash password before saving
-    const passwordToSave = password || 'abc1234';
+    const passwordToSave = password || 'cerdasdanreligius';
     const hashedPassword = await hashPassword(passwordToSave);
 
     // Create new murid
