@@ -112,7 +112,7 @@ export const createGuru = async (req, res) => {
     }
 
     // Hash password before saving
-    const passwordToSave = password || 'cerdasdanreligius';
+    const passwordToSave = password || 'abc1234';
     const hashedPassword = await hashPassword(passwordToSave);
 
     // Username: nama lengkap huruf kecil tanpa spasi (e.g. Ari Mardiansyah -> arimardiansyah)

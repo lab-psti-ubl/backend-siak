@@ -6,6 +6,7 @@ import {
   updateCBTBankSoal,
   deleteCBTBankSoal,
 } from '../controllers/cbtBankSoalController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -16,13 +17,13 @@ router.get('/', getAllCBTBankSoal);
 router.get('/:id', getCBTBankSoalById);
 
 // POST create bank soal CBT
-router.post('/', createCBTBankSoal);
+router.post('/', authenticateToken, createCBTBankSoal);
 
 // PUT update bank soal CBT
-router.put('/:id', updateCBTBankSoal);
+router.put('/:id', authenticateToken, updateCBTBankSoal);
 
 // DELETE bank soal CBT
-router.delete('/:id', deleteCBTBankSoal);
+router.delete('/:id', authenticateToken, deleteCBTBankSoal);
 
 export default router;
 

@@ -2,7 +2,16 @@ import Kelas from '../models/Kelas.js';
 import Guru from '../models/Guru.js';
 import Murid from '../models/Murid.js';
 import Jurusan from '../models/Jurusan.js';
+import PengaturanJenjangPendidikan from '../models/PengaturanJenjangPendidikan.js';
 import { ensureRiwayatKelasWali } from '../utils/riwayatWaliKelasUtils.js';
+
+/** Jurusan hanya untuk jenjang SMA/SMK. SD dan SMP tidak menggunakan jurusan. */
+const getEffectiveJurusanId = async (jurusanIdFromBody) => {
+  const jenjangDoc = await PengaturanJenjangPendidikan.findOne({ isActive: true });
+  const jenjang = jenjangDoc?.jenjang;
+  if (jenjang === 'SMA/SMK') return jurusanIdFromBody || undefined;
+  return undefined;
+};
 
 // Get all kelas
 export const getAllKelas = async (req, res) => {
@@ -77,7 +86,7 @@ export const createKelas = async (req, res) => {
       });
     }
 
-    // Validate jurusan if provided
+    // Validate jurusan if provided (hanya untuk SMA/SMK)
     if (jurusanId) {
       const jurusan = await Jurusan.findOne({ id: jurusanId });
       if (!jurusan) {
@@ -87,6 +96,9 @@ export const createKelas = async (req, res) => {
         });
       }
     }
+
+    // Untuk SD/SMP: jurusanId tidak disimpan (hanya SMA/SMK yang pakai jurusan)
+    const effectiveJurusanId = await getEffectiveJurusanId(jurusanId);
 
     // Validate wali kelas if provided
     if (waliKelasId) {
@@ -104,7 +116,7 @@ export const createKelas = async (req, res) => {
       id: `kelas${Date.now()}`,
       name,
       tingkat,
-      jurusanId: jurusanId || undefined,
+      jurusanId: effectiveJurusanId,
       waliKelasId: waliKelasId || undefined,
       createdAt: new Date().toISOString(),
     });
@@ -164,7 +176,7 @@ export const updateKelas = async (req, res) => {
       }
     }
 
-    // Validate jurusan if provided
+    // Validate jurusan if provided (hanya untuk SMA/SMK)
     if (jurusanId) {
       const jurusan = await Jurusan.findOne({ id: jurusanId });
       if (!jurusan) {
@@ -220,11 +232,13 @@ export const updateKelas = async (req, res) => {
       );
     }
 
-    // Update kelas data
+    // Update kelas data: jurusanId mengikuti jenjang (SD/SMP = tidak pakai jurusan)
+    const jurusanIdToUse = jurusanId !== undefined ? jurusanId : kelas.jurusanId;
+    const effectiveJurusanId = await getEffectiveJurusanId(jurusanIdToUse);
     const updateData = {};
     if (name) updateData.name = name;
     if (tingkat) updateData.tingkat = tingkat;
-    if (jurusanId !== undefined) updateData.jurusanId = jurusanId;
+    updateData.jurusanId = effectiveJurusanId;
     if (waliKelasId !== undefined) updateData.waliKelasId = waliKelasId;
 
     await Kelas.updateOne({ id }, updateData);

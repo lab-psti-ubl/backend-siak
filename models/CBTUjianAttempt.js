@@ -9,6 +9,8 @@ const ujianResponseSchema = new mongoose.Schema(
     jawabanEssay: { type: String, default: '' },
     poinAuto: { type: Number, default: 0 },
     isCorrectAuto: { type: Boolean, default: false },
+    // Untuk penilaian manual (khususnya essay)
+    isCorrect: { type: Boolean, default: null },
   },
   { _id: false }
 );

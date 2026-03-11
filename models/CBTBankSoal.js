@@ -84,8 +84,14 @@ const cbtBankSoalSchema = new mongoose.Schema(
         'benar_salah',
         'menjodohkan',
         'essay',
+        'custom',
       ],
       required: true,
+    },
+    totalSoal: { type: Number, default: null, min: 1 },
+    customKuota: {
+      type: Object,
+      default: {},
     },
     // Array semua soal di bank ini (50 soal pilihan ganda = 50 item di sini)
     soal: {

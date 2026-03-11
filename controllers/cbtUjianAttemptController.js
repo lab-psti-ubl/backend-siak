@@ -134,6 +134,7 @@ export const updateCBTUjianAttempt = async (req, res) => {
         jawabanEssay: r.jawabanEssay || '',
         poinAuto: 0,
         isCorrectAuto: false,
+        isCorrect: null,
       }));
     }
 
@@ -214,8 +215,11 @@ export const updateCBTUjianAttempt = async (req, res) => {
       };
     });
 
+    const hasEssayInBank = (bankSoal.soal || []).some((s) => s.tipe === 'essay');
+
     attempt.skorAuto = totalAuto;
-    attempt.skorTotal = totalAuto;
+    // Jika ada essay, skor total menunggu penilaian manual oleh guru.
+    attempt.skorTotal = hasEssayInBank ? null : totalAuto;
     attempt.status = 'selesai';
     attempt.finishedAt = new Date().toISOString();
     attempt.updatedAt = attempt.finishedAt;
@@ -433,15 +437,19 @@ export const gradeEssayCBTUjianAttempt = async (req, res) => {
 
     let totalEssay = 0;
 
-    // Hitung total poin dari semua soal essay yang dinilai guru
-    attempt.responses.forEach((r) => {
+    // Simpan status benar/salah per response essay, dan hitung total poin essay manual
+    attempt.responses = (attempt.responses || []).map((r) => {
       const soal = soalMap.get(r.soalId);
-      if (!soal || soal.tipe !== 'essay') return;
+      if (!soal || soal.tipe !== 'essay') return r;
 
       const isCorrect = hasilMap.get(r.soalId);
       if (isCorrect === true) {
         totalEssay += soal.poin || 0;
       }
+      return {
+        ...(r.toObject ? r.toObject() : r),
+        isCorrect: typeof isCorrect === 'boolean' ? isCorrect : null,
+      };
     });
 
     attempt.skorEssayManual = totalEssay;

@@ -63,6 +63,7 @@ import cbtKelasRoutes from './routes/cbtKelasRoutes.js';
 import cbtBankSoalRoutes from './routes/cbtBankSoalRoutes.js';
 import cbtUjianRoutes from './routes/cbtUjianRoutes.js';
 import cbtUjianAttemptRoutes from './routes/cbtUjianAttemptRoutes.js';
+import cbtSoalInputAssignmentRoutes from './routes/cbtSoalInputAssignmentRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -137,6 +138,7 @@ app.use('/api/cbt-kelas', cbtKelasRoutes);
 app.use('/api/cbt-bank-soal', cbtBankSoalRoutes);
 app.use('/api/cbt-ujian', cbtUjianRoutes);
 app.use('/api/cbt-ujian-attempts', cbtUjianAttemptRoutes);
+app.use('/api/cbt-soal-input-assignments', cbtSoalInputAssignmentRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

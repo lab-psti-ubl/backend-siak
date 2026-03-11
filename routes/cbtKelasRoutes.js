@@ -5,6 +5,7 @@ import {
   updateCBTKelas,
   deleteCBTKelas,
 } from '../controllers/cbtKelasController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -12,13 +13,13 @@ const router = express.Router();
 router.get('/', getAllCBTKelas);
 
 // POST create CBT kelas
-router.post('/', createCBTKelas);
+router.post('/', authenticateToken, createCBTKelas);
 
 // PUT update CBT kelas
-router.put('/:id', updateCBTKelas);
+router.put('/:id', authenticateToken, updateCBTKelas);
 
 // DELETE CBT kelas
-router.delete('/:id', deleteCBTKelas);
+router.delete('/:id', authenticateToken, deleteCBTKelas);
 
 export default router;
 

@@ -143,7 +143,7 @@ export const createMurid = async (req, res) => {
     const qrCode = generateQRCodeData(newId, nisn, name, kelasId);
 
     // Hash password before saving
-    const passwordToSave = password || 'cerdasdanreligius';
+    const passwordToSave = password || 'abc1234';
     const hashedPassword = await hashPassword(passwordToSave);
 
     // Create new murid
@@ -382,6 +382,72 @@ export const toggleMuridStatus = async (req, res) => {
       success: false,
       message: 'Terjadi kesalahan saat mengubah status murid',
     });
+  }
+};
+
+// Public profile image endpoint by internal id (no auth) - kept for backward compatibility
+export const getMuridProfileImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const murid = await Murid.findOne({ id });
+
+    if (!murid || !murid.profileImage) {
+      return res.status(404).send('Foto profil tidak ditemukan');
+    }
+
+    const dataUrl = murid.profileImage;
+    const match = /^data:(.+);base64,(.*)$/.exec(dataUrl);
+
+    if (!match) {
+      return res.status(400).send('Format foto profil tidak valid');
+    }
+
+    const mimeType = match[1];
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Length', buffer.length);
+    // Cache 1 hari
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+
+    return res.end(buffer);
+  } catch (error) {
+    console.error('Get murid profile image error:', error);
+    return res.status(500).send('Terjadi kesalahan saat mengambil foto profil');
+  }
+};
+
+// Public profile image endpoint by NISN (no auth) - recommended for sharing
+export const getMuridProfileImageByNisn = async (req, res) => {
+  try {
+    const { nisn } = req.params;
+    const murid = await Murid.findOne({ nisn });
+
+    if (!murid || !murid.profileImage) {
+      return res.status(404).send('Foto profil tidak ditemukan');
+    }
+
+    const dataUrl = murid.profileImage;
+    const match = /^data:(.+);base64,(.*)$/.exec(dataUrl);
+
+    if (!match) {
+      return res.status(400).send('Format foto profil tidak valid');
+    }
+
+    const mimeType = match[1];
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Length', buffer.length);
+    // Cache 1 hari
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+
+    return res.end(buffer);
+  } catch (error) {
+    console.error('Get murid profile image by NISN error:', error);
+    return res.status(500).send('Terjadi kesalahan saat mengambil foto profil');
   }
 };
 

@@ -36,12 +36,26 @@ export const getAllCBTKelas = async (req, res) => {
 // POST /api/cbt-kelas
 export const createCBTKelas = async (req, res) => {
   try {
+    const actor = req.user;
+    if (!actor) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token tidak ditemukan. Silakan login terlebih dahulu.',
+      });
+    }
     const { guruId, tingkat, mataPelajaranId, semester, tahunAjaran } = req.body;
 
     if (!guruId || !tingkat || !mataPelajaranId || !semester || !tahunAjaran) {
       return res.status(400).json({
         success: false,
         message: 'Guru, tingkat, mata pelajaran, semester, dan tahun ajaran wajib diisi',
+      });
+    }
+
+    if (actor.role === 'guru' && guruId !== actor.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Anda tidak memiliki akses untuk membuat kelas CBT untuk guru lain.',
       });
     }
 
@@ -95,6 +109,13 @@ export const createCBTKelas = async (req, res) => {
 // PUT /api/cbt-kelas/:id
 export const updateCBTKelas = async (req, res) => {
   try {
+    const actor = req.user;
+    if (!actor) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token tidak ditemukan. Silakan login terlebih dahulu.',
+      });
+    }
     const { id } = req.params;
     const { tingkat, mataPelajaranId, semester, tahunAjaran } = req.body;
 
@@ -103,6 +124,13 @@ export const updateCBTKelas = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Kelas CBT tidak ditemukan',
+      });
+    }
+
+    if (actor.role === 'guru' && cbtKelas.guruId !== actor.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Anda tidak memiliki akses untuk memperbarui kelas CBT ini.',
       });
     }
 
@@ -140,6 +168,13 @@ export const updateCBTKelas = async (req, res) => {
 // DELETE /api/cbt-kelas/:id
 export const deleteCBTKelas = async (req, res) => {
   try {
+    const actor = req.user;
+    if (!actor) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token tidak ditemukan. Silakan login terlebih dahulu.',
+      });
+    }
     const { id } = req.params;
 
     const cbtKelas = await CBTKelas.findOne({ id });
@@ -147,6 +182,13 @@ export const deleteCBTKelas = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Kelas CBT tidak ditemukan',
+      });
+    }
+
+    if (actor.role === 'guru' && cbtKelas.guruId !== actor.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Anda tidak memiliki akses untuk menghapus kelas CBT ini.',
       });
     }
 

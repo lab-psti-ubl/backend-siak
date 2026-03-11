@@ -186,7 +186,7 @@ export const addUstadz = async (req, res) => {
       }
 
       // Hash password
-      const passwordToSave = password || 'cerdasdanreligius';
+      const passwordToSave = password || 'abc1234';
       const hashedPassword = await hashPassword(passwordToSave);
 
       const { getUniqueUsernameForGuru } = await import('../utils/usernameUtils.js');

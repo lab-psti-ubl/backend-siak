@@ -316,7 +316,7 @@ export const login = async (req, res) => {
         }
       } else {
         // Fallback to default password
-        isValidPassword = password === 'cerdasdanreligius';
+        isValidPassword = password === 'abc1234';
       }
     }
 

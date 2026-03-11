@@ -482,7 +482,7 @@ export const assignSpmbRegistrationsToClass = async (req, res) => {
 
       const newId = `murid${Date.now()}${Math.floor(Math.random() * 1000)}`;
       const qrCode = nisn;
-      const passwordToSave = 'cerdasdanreligius';
+      const passwordToSave = 'abc1234';
       const hashedPassword = await hashPassword(passwordToSave);
 
       const muridDoc = new Murid({

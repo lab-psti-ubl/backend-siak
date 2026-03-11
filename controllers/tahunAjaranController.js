@@ -1,5 +1,27 @@
 import TahunAjaran from '../models/TahunAjaran.js';
 
+const isValidDateString = (value) => {
+  if (!value) return false;
+  const d = new Date(value);
+  return !Number.isNaN(d.getTime());
+};
+
+const validateTanggalRange = (tanggalMulai, tanggalSelesai) => {
+  if (!isValidDateString(tanggalMulai) || !isValidDateString(tanggalSelesai)) {
+    return {
+      ok: false,
+      message: 'Tanggal mulai dan tanggal selesai wajib diisi dan harus valid',
+    };
+  }
+  if (tanggalMulai >= tanggalSelesai) {
+    return {
+      ok: false,
+      message: 'Tanggal selesai harus lebih besar dari tanggal mulai',
+    };
+  }
+  return { ok: true };
+};
+
 // Get all tahun ajaran
 export const getAllTahunAjaran = async (req, res) => {
   try {
@@ -178,12 +200,25 @@ export const updateTahunAjaran = async (req, res) => {
       });
     }
 
-    // Validation
-    if (tanggalMulai && tanggalSelesai && tanggalMulai >= tanggalSelesai) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tanggal selesai harus lebih besar dari tanggal mulai',
-      });
+    // Jika mau mengaktifkan, tanggal wajib ada & valid (boleh dikirim di request atau sudah tersimpan di DB)
+    if (isActive === true) {
+      const mergedTanggalMulai = tanggalMulai ?? tahunAjaran.tanggalMulai;
+      const mergedTanggalSelesai = tanggalSelesai ?? tahunAjaran.tanggalSelesai;
+      const v = validateTanggalRange(mergedTanggalMulai, mergedTanggalSelesai);
+      if (!v.ok) {
+        return res.status(400).json({
+          success: false,
+          message: v.message,
+        });
+      }
+    } else {
+      // Validation untuk update tanggal (jika keduanya diisi)
+      if (tanggalMulai && tanggalSelesai && tanggalMulai >= tanggalSelesai) {
+        return res.status(400).json({
+          success: false,
+          message: 'Tanggal selesai harus lebih besar dari tanggal mulai',
+        });
+      }
     }
 
     // Check if tahun and semester combination already exists (excluding current)
@@ -245,6 +280,15 @@ export const activateTahunAjaran = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Tahun ajaran tidak ditemukan',
+      });
+    }
+
+    // Wajib punya tanggal valid saat aktivasi
+    const v = validateTanggalRange(tahunAjaran.tanggalMulai, tahunAjaran.tanggalSelesai);
+    if (!v.ok) {
+      return res.status(400).json({
+        success: false,
+        message: `${v.message}. Silakan edit tahun ajaran dan isi tanggal mulai & tanggal selesai terlebih dahulu.`,
       });
     }
 
