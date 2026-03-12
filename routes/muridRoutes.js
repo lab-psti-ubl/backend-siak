@@ -6,18 +6,16 @@ import {
   updateMurid,
   deleteMurid,
   toggleMuridStatus,
-  getMuridProfileImage,
   getMuridProfileImageByNisn,
 } from '../controllers/muridController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Public routes (no auth) for sharing profile photo
-router.get('/:id/foto', getMuridProfileImage);
-router.get('/nisn/:nisn/foto', getMuridProfileImageByNisn);
+// Public route: akses foto profil murid berdasarkan NISN tanpa autentikasi
+router.get('/public/profile-photo/:nisn', getMuridProfileImageByNisn);
 
-// Apply authentication middleware to all other routes
+// Apply authentication middleware to all routes below
 router.use(authenticateToken);
 
 router.get('/', getAllMurid);
