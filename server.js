@@ -1,150 +1,207 @@
-import './config/env.js';
-import express from 'express';
-import cors from 'cors';
-import connectDB from './config/database.js';
-import authRoutes from './routes/authRoutes.js';
-import activationRoutes from './routes/activationRoutes.js';
-import jenjangRoutes from './routes/jenjangRoutes.js';
-import guruRoutes from './routes/guruRoutes.js';
-import jurusanRoutes from './routes/jurusanRoutes.js';
-import kelasRoutes from './routes/kelasRoutes.js';
-import muridRoutes from './routes/muridRoutes.js';
-import tahunAjaranRoutes from './routes/tahunAjaranRoutes.js';
-import mataPelajaranRoutes from './routes/mataPelajaranRoutes.js';
-import guruMapelRoutes from './routes/guruMapelRoutes.js';
-import jadwalPelajaranRoutes from './routes/jadwalPelajaranRoutes.js';
-import pengaturanAbsenRoutes from './routes/pengaturanAbsenRoutes.js';
-import pengaturanSKSRoutes from './routes/pengaturanSKSRoutes.js';
-import pengaturanIstirahatRoutes from './routes/pengaturanIstirahatRoutes.js';
-import profilSekolahRoutes from './routes/profilSekolahRoutes.js';
-import backgroundKTARoutes from './routes/backgroundKTARoutes.js';
-import dataKepsekRoutes from './routes/dataKepsekRoutes.js';
-import pengaturanKomponenNilaiRoutes from './routes/pengaturanKomponenNilaiRoutes.js';
-import pengaturanGradeRoutes from './routes/pengaturanGradeRoutes.js';
-import pengaturanNilaiMinimalRoutes from './routes/pengaturanNilaiMinimalRoutes.js';
-import sesiAbsensiRoutes from './routes/sesiAbsensiRoutes.js';
-import sesiAbsensiTahfizRoutes from './routes/sesiAbsensiTahfizRoutes.js';
-import izinGuruRoutes from './routes/izinGuruRoutes.js';
-import suratIzinRoutes from './routes/suratIzinRoutes.js';
-import absensiGuruRoutes from './routes/absensiGuruRoutes.js';
-import absensiRoutes from './routes/absensiRoutes.js';
-import riwayatKelasMuridRoutes from './routes/riwayatKelasMuridRoutes.js';
-import alatRFIDRoutes from './routes/alatRFIDRoutes.js';
-import pengaturanSistemRoutes from './routes/pengaturanSistemRoutes.js';
-import waliKelasSettingsRoutes from './routes/waliKelasSettingsRoutes.js';
-import alumniRoutes from './routes/alumniRoutes.js';
-import ustadzRoutes from './routes/ustadzRoutes.js';
-import santriRoutes from './routes/santriRoutes.js';
-import kelasTahfizRoutes from './routes/kelasTahfizRoutes.js';
-import nilaiRoutes from './routes/nilaiRoutes.js';
-import statusKenaikanKelasRoutes from './routes/statusKenaikanKelasRoutes.js';
-import statusBagiRaportRoutes from './routes/statusBagiRaportRoutes.js';
-import riwayatWaliKelasRoutes from './routes/riwayatWaliKelasRoutes.js';
-import infoSekolahRoutes from './routes/infoSekolahRoutes.js';
-import pengumumanKelulusanRoutes from './routes/pengumumanKelulusanRoutes.js';
-import readNotificationRoutes from './routes/readNotificationRoutes.js';
-import raportRoutes from './routes/raportRoutes.js';
-import hasGivenKenaikanKelasInfoRoutes from './routes/hasGivenKenaikanKelasInfoRoutes.js';
-import capaianPembelajaranRoutes from './routes/capaianPembelajaranRoutes.js';
-import ekstrakulikulerRoutes from './routes/ekstrakulikulerRoutes.js';
-import nilaiEkstrakulikulerRoutes from './routes/nilaiEkstrakulikulerRoutes.js';
-import kokulikulerRoutes from './routes/kokulikulerRoutes.js';
-import eraportRoutes from './routes/eraportRoutes.js';
-import jurnalRoutes from './routes/jurnalRoutes.js';
-import jurnalTahfizRoutes from './routes/jurnalTahfizRoutes.js';
-import jadwalTahfizRoutes from './routes/jadwalTahfizRoutes.js';
-import progressHafalanRoutes from './routes/progressHafalanRoutes.js';
-import dataFaceRecognitionRoutes from './routes/dataFaceRecognitionRoutes.js';
-import autoAlfaService from './services/autoAlfaService.js';
-import sseRoutes from './routes/sseRoutes.js';
-import resetDatabaseRoutes from './routes/resetDatabaseRoutes.js';
-import spmbRoutes from './routes/spmbRoutes.js';
-import cbtKelasRoutes from './routes/cbtKelasRoutes.js';
-import cbtBankSoalRoutes from './routes/cbtBankSoalRoutes.js';
-import cbtUjianRoutes from './routes/cbtUjianRoutes.js';
-import cbtUjianAttemptRoutes from './routes/cbtUjianAttemptRoutes.js';
-import cbtSoalInputAssignmentRoutes from './routes/cbtSoalInputAssignmentRoutes.js';
+import "./config/env.js";
+import express from "express";
+import cors from "cors";
+import connectDB from "./config/database.js";
+import authRoutes from "./routes/authRoutes.js";
+import activationRoutes from "./routes/activationRoutes.js";
+import jenjangRoutes from "./routes/jenjangRoutes.js";
+import guruRoutes from "./routes/guruRoutes.js";
+import jurusanRoutes from "./routes/jurusanRoutes.js";
+import kelasRoutes from "./routes/kelasRoutes.js";
+import muridRoutes from "./routes/muridRoutes.js";
+import tahunAjaranRoutes from "./routes/tahunAjaranRoutes.js";
+import mataPelajaranRoutes from "./routes/mataPelajaranRoutes.js";
+import guruMapelRoutes from "./routes/guruMapelRoutes.js";
+import jadwalPelajaranRoutes from "./routes/jadwalPelajaranRoutes.js";
+import pengaturanAbsenRoutes from "./routes/pengaturanAbsenRoutes.js";
+import pengaturanSKSRoutes from "./routes/pengaturanSKSRoutes.js";
+import pengaturanIstirahatRoutes from "./routes/pengaturanIstirahatRoutes.js";
+import profilSekolahRoutes from "./routes/profilSekolahRoutes.js";
+import backgroundKTARoutes from "./routes/backgroundKTARoutes.js";
+import dataKepsekRoutes from "./routes/dataKepsekRoutes.js";
+import pengaturanKomponenNilaiRoutes from "./routes/pengaturanKomponenNilaiRoutes.js";
+import pengaturanGradeRoutes from "./routes/pengaturanGradeRoutes.js";
+import pengaturanNilaiMinimalRoutes from "./routes/pengaturanNilaiMinimalRoutes.js";
+import sesiAbsensiRoutes from "./routes/sesiAbsensiRoutes.js";
+import sesiAbsensiTahfizRoutes from "./routes/sesiAbsensiTahfizRoutes.js";
+import izinGuruRoutes from "./routes/izinGuruRoutes.js";
+import suratIzinRoutes from "./routes/suratIzinRoutes.js";
+import absensiGuruRoutes from "./routes/absensiGuruRoutes.js";
+import absensiRoutes from "./routes/absensiRoutes.js";
+import riwayatKelasMuridRoutes from "./routes/riwayatKelasMuridRoutes.js";
+import alatRFIDRoutes from "./routes/alatRFIDRoutes.js";
+import pengaturanSistemRoutes from "./routes/pengaturanSistemRoutes.js";
+import waliKelasSettingsRoutes from "./routes/waliKelasSettingsRoutes.js";
+import alumniRoutes from "./routes/alumniRoutes.js";
+import ustadzRoutes from "./routes/ustadzRoutes.js";
+import santriRoutes from "./routes/santriRoutes.js";
+import kelasTahfizRoutes from "./routes/kelasTahfizRoutes.js";
+import nilaiRoutes from "./routes/nilaiRoutes.js";
+import statusKenaikanKelasRoutes from "./routes/statusKenaikanKelasRoutes.js";
+import statusBagiRaportRoutes from "./routes/statusBagiRaportRoutes.js";
+import riwayatWaliKelasRoutes from "./routes/riwayatWaliKelasRoutes.js";
+import infoSekolahRoutes from "./routes/infoSekolahRoutes.js";
+import pengumumanKelulusanRoutes from "./routes/pengumumanKelulusanRoutes.js";
+import readNotificationRoutes from "./routes/readNotificationRoutes.js";
+import raportRoutes from "./routes/raportRoutes.js";
+import hasGivenKenaikanKelasInfoRoutes from "./routes/hasGivenKenaikanKelasInfoRoutes.js";
+import capaianPembelajaranRoutes from "./routes/capaianPembelajaranRoutes.js";
+import ekstrakulikulerRoutes from "./routes/ekstrakulikulerRoutes.js";
+import nilaiEkstrakulikulerRoutes from "./routes/nilaiEkstrakulikulerRoutes.js";
+import kokulikulerRoutes from "./routes/kokulikulerRoutes.js";
+import eraportRoutes from "./routes/eraportRoutes.js";
+import jurnalRoutes from "./routes/jurnalRoutes.js";
+import jurnalTahfizRoutes from "./routes/jurnalTahfizRoutes.js";
+import jadwalTahfizRoutes from "./routes/jadwalTahfizRoutes.js";
+import progressHafalanRoutes from "./routes/progressHafalanRoutes.js";
+import dataFaceRecognitionRoutes from "./routes/dataFaceRecognitionRoutes.js";
+import autoAlfaService from "./services/autoAlfaService.js";
+import sseRoutes from "./routes/sseRoutes.js";
+import resetDatabaseRoutes from "./routes/resetDatabaseRoutes.js";
+import spmbRoutes from "./routes/spmbRoutes.js";
+import cbtKelasRoutes from "./routes/cbtKelasRoutes.js";
+import cbtBankSoalRoutes from "./routes/cbtBankSoalRoutes.js";
+import cbtUjianRoutes from "./routes/cbtUjianRoutes.js";
+import cbtUjianAttemptRoutes from "./routes/cbtUjianAttemptRoutes.js";
+import cbtSoalInputAssignmentRoutes from "./routes/cbtSoalInputAssignmentRoutes.js";
+import Murid from "./models/Murid.js";
+import Santri from "./models/Santri.js";
 
 const app = express();
 const PORT = process.env.PORT;
 if (!PORT) {
-  console.error('❌ PORT belum diset di file .env');
+  console.error("❌ PORT belum diset di file .env");
   process.exit(1);
 }
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({limit: "50mb"}));
+app.use(express.urlencoded({extended: true, limit: "50mb"}));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/activation', activationRoutes);
-app.use('/api/jenjang', jenjangRoutes);
-app.use('/api/guru', guruRoutes);
-app.use('/api/jurusan', jurusanRoutes);
-app.use('/api/kelas', kelasRoutes);
-app.use('/api/murid', muridRoutes);
-app.use('/api/tahun-ajaran', tahunAjaranRoutes);
-app.use('/api/mata-pelajaran', mataPelajaranRoutes);
-app.use('/api/guru-mapel', guruMapelRoutes);
-app.use('/api/jadwal-pelajaran', jadwalPelajaranRoutes);
-app.use('/api/pengaturan-absen', pengaturanAbsenRoutes);
-app.use('/api/pengaturan-sks', pengaturanSKSRoutes);
-app.use('/api/pengaturan-istirahat', pengaturanIstirahatRoutes);
-app.use('/api/profil-sekolah', profilSekolahRoutes);
-app.use('/api/background-kta', backgroundKTARoutes);
-app.use('/api/data-kepsek', dataKepsekRoutes);
-app.use('/api/pengaturan-komponen-nilai', pengaturanKomponenNilaiRoutes);
-app.use('/api/pengaturan-grade', pengaturanGradeRoutes);
-app.use('/api/pengaturan-nilai-minimal', pengaturanNilaiMinimalRoutes);
-app.use('/api/sesi-absensi', sesiAbsensiRoutes);
-app.use('/api/sesi-absensi-tahfiz', sesiAbsensiTahfizRoutes);
-app.use('/api/izin-guru', izinGuruRoutes);
-app.use('/api/surat-izin', suratIzinRoutes);
-app.use('/api/absensi-guru', absensiGuruRoutes);
-app.use('/api/absensi', absensiRoutes);
-app.use('/api/riwayat-kelas-murid', riwayatKelasMuridRoutes);
-app.use('/api/alat-rfid', alatRFIDRoutes);
-app.use('/api/pengaturan-sistem', pengaturanSistemRoutes);
-app.use('/api/wali-kelas-settings', waliKelasSettingsRoutes);
-app.use('/api/alumni', alumniRoutes);
-app.use('/api/ustadz', ustadzRoutes);
-app.use('/api/santri', santriRoutes);
-app.use('/api/kelas-tahfiz', kelasTahfizRoutes);
-app.use('/api/jadwal-tahfiz', jadwalTahfizRoutes);
-app.use('/api/nilai', nilaiRoutes);
-app.use('/api/status-kenaikan-kelas', statusKenaikanKelasRoutes);
-app.use('/api/status-bagi-raport', statusBagiRaportRoutes);
-app.use('/api/riwayat-wali-kelas', riwayatWaliKelasRoutes);
-app.use('/api/info-sekolah', infoSekolahRoutes);
-app.use('/api/pengumuman-kelulusan', pengumumanKelulusanRoutes);
-app.use('/api/read-notifications', readNotificationRoutes);
-app.use('/api/raport', raportRoutes);
-app.use('/api/has-given-kenaikan-kelas-info', hasGivenKenaikanKelasInfoRoutes);
-app.use('/api/capaian-pembelajaran', capaianPembelajaranRoutes);
-app.use('/api/ekstrakulikuler', ekstrakulikulerRoutes);
-app.use('/api/nilai-ekstrakulikuler', nilaiEkstrakulikulerRoutes);
-app.use('/api/kokulikuler', kokulikulerRoutes);
-app.use('/api/e-raport', eraportRoutes);
-app.use('/api/jurnal', jurnalRoutes);
-app.use('/api/jurnal-tahfiz', jurnalTahfizRoutes);
-app.use('/api/progress-hafalan', progressHafalanRoutes);
-app.use('/api/data-face-recognition', dataFaceRecognitionRoutes);
-app.use('/api/sse', sseRoutes);
-app.use('/api/reset-database', resetDatabaseRoutes);
-app.use('/api/spmb', spmbRoutes);
-app.use('/api/cbt-kelas', cbtKelasRoutes);
-app.use('/api/cbt-bank-soal', cbtBankSoalRoutes);
-app.use('/api/cbt-ujian', cbtUjianRoutes);
-app.use('/api/cbt-ujian-attempts', cbtUjianAttemptRoutes);
-app.use('/api/cbt-soal-input-assignments', cbtSoalInputAssignmentRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/activation", activationRoutes);
+app.use("/api/jenjang", jenjangRoutes);
+app.use("/api/guru", guruRoutes);
+app.use("/api/jurusan", jurusanRoutes);
+app.use("/api/kelas", kelasRoutes);
+app.use("/api/murid", muridRoutes);
+app.use("/api/tahun-ajaran", tahunAjaranRoutes);
+app.use("/api/mata-pelajaran", mataPelajaranRoutes);
+app.use("/api/guru-mapel", guruMapelRoutes);
+app.use("/api/jadwal-pelajaran", jadwalPelajaranRoutes);
+app.use("/api/pengaturan-absen", pengaturanAbsenRoutes);
+app.use("/api/pengaturan-sks", pengaturanSKSRoutes);
+app.use("/api/pengaturan-istirahat", pengaturanIstirahatRoutes);
+app.use("/api/profil-sekolah", profilSekolahRoutes);
+app.use("/api/background-kta", backgroundKTARoutes);
+app.use("/api/data-kepsek", dataKepsekRoutes);
+app.use("/api/pengaturan-komponen-nilai", pengaturanKomponenNilaiRoutes);
+app.use("/api/pengaturan-grade", pengaturanGradeRoutes);
+app.use("/api/pengaturan-nilai-minimal", pengaturanNilaiMinimalRoutes);
+app.use("/api/sesi-absensi", sesiAbsensiRoutes);
+app.use("/api/sesi-absensi-tahfiz", sesiAbsensiTahfizRoutes);
+app.use("/api/izin-guru", izinGuruRoutes);
+app.use("/api/surat-izin", suratIzinRoutes);
+app.use("/api/absensi-guru", absensiGuruRoutes);
+app.use("/api/absensi", absensiRoutes);
+app.use("/api/riwayat-kelas-murid", riwayatKelasMuridRoutes);
+app.use("/api/alat-rfid", alatRFIDRoutes);
+app.use("/api/pengaturan-sistem", pengaturanSistemRoutes);
+app.use("/api/wali-kelas-settings", waliKelasSettingsRoutes);
+app.use("/api/alumni", alumniRoutes);
+app.use("/api/ustadz", ustadzRoutes);
+app.use("/api/santri", santriRoutes);
+app.use("/api/kelas-tahfiz", kelasTahfizRoutes);
+app.use("/api/jadwal-tahfiz", jadwalTahfizRoutes);
+app.use("/api/nilai", nilaiRoutes);
+app.use("/api/status-kenaikan-kelas", statusKenaikanKelasRoutes);
+app.use("/api/status-bagi-raport", statusBagiRaportRoutes);
+app.use("/api/riwayat-wali-kelas", riwayatWaliKelasRoutes);
+app.use("/api/info-sekolah", infoSekolahRoutes);
+app.use("/api/pengumuman-kelulusan", pengumumanKelulusanRoutes);
+app.use("/api/read-notifications", readNotificationRoutes);
+app.use("/api/raport", raportRoutes);
+app.use("/api/has-given-kenaikan-kelas-info", hasGivenKenaikanKelasInfoRoutes);
+app.use("/api/capaian-pembelajaran", capaianPembelajaranRoutes);
+app.use("/api/ekstrakulikuler", ekstrakulikulerRoutes);
+app.use("/api/nilai-ekstrakulikuler", nilaiEkstrakulikulerRoutes);
+app.use("/api/kokulikuler", kokulikulerRoutes);
+app.use("/api/e-raport", eraportRoutes);
+app.use("/api/jurnal", jurnalRoutes);
+app.use("/api/jurnal-tahfiz", jurnalTahfizRoutes);
+app.use("/api/progress-hafalan", progressHafalanRoutes);
+app.use("/api/data-face-recognition", dataFaceRecognitionRoutes);
+app.use("/api/sse", sseRoutes);
+app.use("/api/reset-database", resetDatabaseRoutes);
+app.use("/api/spmb", spmbRoutes);
+app.use("/api/cbt-kelas", cbtKelasRoutes);
+app.use("/api/cbt-bank-soal", cbtBankSoalRoutes);
+app.use("/api/cbt-ujian", cbtUjianRoutes);
+app.use("/api/cbt-ujian-attempts", cbtUjianAttemptRoutes);
+app.use("/api/cbt-soal-input-assignments", cbtSoalInputAssignmentRoutes);
+
+// Public route untuk menampilkan foto profil murid berdasarkan NISN
+// Endpoint API: /api/profile/murid/:nisn/upload/:fileName/foto
+// Halaman publik yang dibuka user tetap /profile/murid/:nisn/upload/:fileName/foto (frontend),
+// tetapi <img> di halaman tersebut akan memanggil endpoint /api/... ini secara langsung.
+app.get("/api/profile/murid/:nisn/upload/:fileName/foto", async (req, res) => {
+  try {
+    const {nisn} = req.params;
+
+    if (!nisn) {
+      return res.status(400).send("NISN diperlukan");
+    }
+
+    let profileImage = null;
+
+    // Cari di koleksi Murid terlebih dahulu
+    const murid = await Murid.findOne({nisn});
+    if (murid && murid.profileImage) {
+      profileImage = murid.profileImage;
+    }
+
+    // Jika tidak ditemukan di Murid, coba cari di koleksi Santri (santriData)
+    if (!profileImage) {
+      const santriDoc = await Santri.findOne({id: "santri-single"});
+      if (santriDoc && santriDoc.santriData) {
+        const foundSantri = santriDoc.santriData.find((s) => s.nisn === nisn);
+        if (foundSantri && (foundSantri.profileImage || foundSantri.avatar)) {
+          profileImage = foundSantri.profileImage || foundSantri.avatar;
+        }
+      }
+    }
+
+    if (!profileImage) {
+      return res.status(404).send("Foto profil tidak ditemukan");
+    }
+
+    let contentType = "image/jpeg";
+    let base64Data = profileImage;
+
+    // Jika disimpan dalam format Data URL (data:image/jpeg;base64,....)
+    const dataUrlMatch = base64Data.match(/^data:(.+);base64,(.+)$/);
+    if (dataUrlMatch) {
+      contentType = dataUrlMatch[1] || "image/jpeg";
+      base64Data = dataUrlMatch[2];
+    }
+
+    const imgBuffer = Buffer.from(base64Data, "base64");
+
+    res.setHeader("Content-Type", contentType);
+    res.send(imgBuffer);
+  } catch (error) {
+    console.error("Error fetching murid profile image:", error);
+    res.status(500).send("Terjadi kesalahan saat mengambil foto profil");
+  }
+});
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: 'Server is running',
+    message: "Server is running",
     timestamp: new Date().toISOString(),
   });
 });
@@ -154,11 +211,10 @@ connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📍 API available at http://localhost:${PORT}/api`);
-    
+
     // Start AUTO-ALFA service untuk murid dan guru
     autoAlfaService.start();
   });
 });
 
 export default app;
-
